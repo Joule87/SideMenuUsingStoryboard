@@ -11,6 +11,12 @@ import UIKit
 class SlideInTransition: NSObject, UIViewControllerAnimatedTransitioning {
     
     var isPresenting = false
+    let dimmingView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black
+        view.alpha = 0.0
+        return view
+    }()
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let toViewController = transitionContext.viewController(forKey: .to),
@@ -24,6 +30,10 @@ class SlideInTransition: NSObject, UIViewControllerAnimatedTransitioning {
         let finalHeight = toViewController.view.bounds.height
         
         if isPresenting {
+            //Add dimming view
+            containerView.addSubview(dimmingView)
+            dimmingView.frame = containerView.bounds
+            
             //Add menu view controller to container
             containerView.addSubview(toViewController.view)
             
@@ -33,11 +43,13 @@ class SlideInTransition: NSObject, UIViewControllerAnimatedTransitioning {
         
         //Animate menu in screen
         let transform = {
+            self.dimmingView.alpha = 0.5
             toViewController.view.transform = CGAffineTransform(translationX: finalWidth, y: 0)
         }
         
         //Animate menu back off screen
         let identity = {
+            self.dimmingView.alpha = 0.0
             fromViewController.view.transform = .identity
         }
         
