@@ -7,8 +7,13 @@
 //
 
 import UIKit
+import os.log
 
 class MenuTableViewController: UITableViewController {
+    
+    typealias MenuTypeAction = ((SideMenuOptions) -> Void)
+    
+    var didTapMenuType: MenuTypeAction?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,9 +41,10 @@ extension MenuTableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let menuOption = SideMenuOptions(rawValue: indexPath.row)
-        dismiss(animated: true) {
-            print("\(menuOption)")
+        guard let menuOption = SideMenuOptions(rawValue: indexPath.row) else { return }
+        dismiss(animated: true) { [weak self] in
+            os_log("Did tap %@ option", log: .userAction, type: .info, menuOption.description)
+            self?.didTapMenuType?(menuOption)
         }
     }
 }
